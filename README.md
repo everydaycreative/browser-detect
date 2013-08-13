@@ -1,7 +1,7 @@
 browser-detect (ALPHA+DRAFT)
 ==============
 
-__Browser-detect__  simply detects from the user-agent the sort of browser being used, checking whether if it is a mobile version and gathering other assorted device information that are useful. It then reports what it detects by populating the HTML root element with classes and also by making avaliable the same information through an object accessible through browserdetect. 
+__Browser-detect__  simply detects from the user-agent the sort of browser being used, checking whether if it is a mobile version of a browser and gathering other assorted device information that are useful. It then reports what it detects by populating the HTML root element with classes and also by making avaliable the same information through an object accessible through browserdetect. 
 
 ### How ###
 
@@ -9,19 +9,18 @@ __Browser-detect__  simply detects from the user-agent the sort of browser being
 ### Why ###
 
 Given the rise of responsive, adaptive and fludic web techniques, designing for devices seem to be a faux-paus. 
-But here is the thing: devices exist and they exist in 'families', and these families are different from each other in not only how we use, but also in the ways we interact them and where use them. A laptop is clearly a sit down device, and even though you can use your phone while sitting down, you will probably use your phone while on the bus rather than pulling out your laptop, especially if you are standing. 
+But here is the thing: devices exist and they exist in 'families', and these families are different from each other in not only how we use them, but also in the ways we interact them and where use them. A laptop is clearly a sit down device, and even though you can use your phone while sitting down, you will probably also use your phone while on the bus instead of than pulling out your laptop, especially if you are standing. On top of that: the creators of these devices know this, and they design 
 
 #### Area of concerns: the seperation of screen and device ####
 It also allows for a separation of concerns in designing where one area of concern is screen size independent of anything device specific (which is done through media queries), and the other area of concern being device relevant.   
 
 #### How is it different from conditionizr?####
 	
-Conditionizr is great, but it does not provide a way to report if the browser detected is a mobile version, and whether it is installed on a phone, tablet, or some other device. 
+Conditionizr is great, but it does not provide a way to report if the browser detected is a mobile version, or whether it is installed on a phone, tablet, or some other device. 
 
 #### How is it currently being used? ####
   
-The developement of this library is spurred by a need that our practice faces in delivering a solution to our clients. 
-We are using it basically as a means to create a 'degrading' gradient that of experience isn't device specific, but rather specific to device families. The aim of creating a commonality of experience within a specific class of devices.
+The developement of this library is spurred by a need that our practice faces in delivering a solution to our clients. We are using it basically as a means to create a 'degrading' gradient of experience that isn't device specific, but rather specific to device families. The aim is in creating a commonality of experience within a specific class of devices.
 
 	
 ### State of developement: ###
