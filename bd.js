@@ -8,6 +8,7 @@
 (function($jquery, win){
   var $ = ($jquery === undefined)?null:$jquery;
   
+  //device information
   
   
 })(jQuery, window);
