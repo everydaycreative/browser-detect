@@ -30,6 +30,6 @@ At this stage, browser-detect is not mature, not stable, and not yet anything re
 #### feature creep and the future of development: ####
  
 * touch detection reporting
-* crystalize the pattern used in development and add the ability to drop tests.
+* crystalize the pattern used in development and add the ability to drop-in tests.
 * add detection of device density according to [Android's guide on support screen sizes](http://developer.android.com/guide/practices/screens_support.html) and report them as such.
 
