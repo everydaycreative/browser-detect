@@ -78,4 +78,11 @@
 		test[k]();
 	}
 
+	//check for jQuery
+	if($jquery){
+
+	}
+
+	//now add the css reporting
+
 })(jQuery, window);
