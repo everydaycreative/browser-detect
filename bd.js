@@ -1,9 +1,10 @@
 /*!
- *  browser-detect  version: 0.1
- *  Browser vendor, touch and dpi checking upon loading.
+ *  Browser-Detect  version: 0.5
+ *  Reports browser vendor, touch and dpi checking upon loading.
  *  http://github.com/everydaycreative/browser-detect
  *  Authors: @everydaycreative (everydaycreative.ca)
- *  Copyright 2013 Everyday Creative. LGPL licensed.
+ *  Copyright 2013 Everyday Creative, unless stated otherwise.
+ *  LGPL licensed.
  */
 (function($jquery, win, prefix){
 	var copy_feature_tree = function(new_tree, tree){
@@ -96,6 +97,21 @@
 				if there is no report no-dpi
 			*/
 		},
+		/*
+			implementing the definition
+			provided by android guide lines
+			are not useful. The small, medium, large
+			and xlarge classes for screens correspond
+			basically to the land of mobile devices 
+			with physical screen sizes of less than 10
+			inches. 
+		"screen":{
+			"report": false,
+			"small": ['small-screen'],
+			"medium": ['medium-screen'],
+			"large": ['large-screen'],
+			"xlarge": ['xlarge-screen']
+		}, */
 		"os":{
 			"android": ['android'],
 			"blackberry": ['blackberry'],
@@ -198,7 +214,7 @@
 	browser_detect['test'] = test;
 
 	var detect_touch = function(){
-		//http://stackoverflow.com/questions/4817029/whats-the-best-way-to-detect-a-touch-screen-device-using-javascript
+		//@Author: http://stackoverflow.com/questions/4817029/whats-the-best-way-to-detect-a-touch-screen-device-using-javascript
 		if('ontouchstart' in window || 'onmsgesturechange' in window){
 			bdetect['touch'] = true;
 		}
@@ -365,6 +381,11 @@
 		}
 	}
 	tests.push(detect_device_type);
+
+	/**
+	var detect_screen = function(){
+		var xlarge = [960,0];
+	};**/
 
 	var detect_browser = function(){
 
