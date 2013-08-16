@@ -2,8 +2,7 @@
  *  browser-detect  version: 0.1
  *  Browser vendor, touch and dpi checking upon loading.
  *  http://github.com/everydaycreative/browser-detect
- *  Authors: @everydaycreative, 
- *  
+ *  Authors: @everydaycreative (everydaycreative.ca)
  *  Copyright 2013 Everyday Creative. LGPL licensed.
  */
 (function($jquery, win, prefix){
@@ -367,6 +366,10 @@
 	}
 	tests.push(detect_device_type);
 
+	var detect_browser = function(){
+
+	}
+	tests.push(detect_browser);
 	run(prefix);
 	
 })(this.jQuery, window, false); //(typeof jQuery=="undefined"?undefined:jQuery)
