@@ -1,28 +1,94 @@
 /*!
  *  browser-detect  version: 0.1
- *  Browser vendor, touch and retina conditional loading.
+ *  Browser vendor, touch and dpi checking upon loading.
  *  http://github.com/everydaycreative/browser-detect
- *  Authors: @everydaycreative
+ *  Authors: @everydaycreative, 
+ *  
  *  Copyright 2013 Everyday Creative. LGPL licensed.
  */
-(function($jquery, win){
-	var $ = ($jquery === undefined)?null:$jquery;
+(function($jquery, win, prefix){
+	var copy_feature_tree = function(new_tree, tree){
+		for(var x in tree){
+			try{
+				if(tree[x].constructor === Object){
+					new_tree[x] = {};
+					copy_feature_tree(new_tree[x], tree[x])
+				}else{
+					new_tree[x] = tree[x];
+				}
+			}catch(error){
+				new_tree[x] = tree[x]
+			}
+		}
+	};
 
-	var classes=["bdjs"];
-	var bdetect = {
-		touch: false,
-		devices:{
-			mobile: false,
-			phone: false,
-			tablet: false
+	var reset_feature_tree = function(tree){
+		for(var x in tree){
+			try{
+				if(tree[x].constructor === Object){
+					reset_feature_tree(tree[x]);
+				}else{
+					tree[x] = false;
+				}
+
+			}catch (error){
+				tree[x] = false;
+			}
+		}
+
+	};
+
+	var classname_from_feature = function(feature, state){
+		if(feature.constructor === Array){
+			if(state){
+				return feature[0];
+			}else{
+				if(feature.length == 2){
+					return feature[1];
+				}
+			}
+		}
+		return "";
+	};
+
+	var evaluate_features = function(states, features){
+		var k;
+		for(var x in states){
+			try{
+				if(states[x].constructor === Object){
+					evaluate_features(states[x], features[x]);
+				}else{
+					k = classname_from_feature(features[x], states[x]);
+					if(k != "")
+						classes.push(k);
+				}
+			}catch(error){
+				k = classname_from_feature(features[x], states[x]);
+				if(k != "")
+					classes.push(k);
+			}
+		}
+	};
+
+	var classes = classes_init = ['bdjs'];
+	var tests = [];
+	var feature_detect = {
+		"touch": ['touch', 'no-touch'],
+		"jq": ['jq', 'no-jq'],
+		"devices":{
+			"mobile": ['mobile', 'no-mobile'],
+			"phone": ['phone'],
+			"tablet": ['tablet'],
+			"iphone": ['iphone'],
+			"ipad": ['ipad'],
+			"other": false
 		},
-
-		dpi:{
-			report: false,	//can't report 
-			ldpi: false,	//0.75
-			mdpi: false,	//1.0
-			hdpi: false,	//1.5
-			xhdpi: false 	//2.0
+		"dpi":{
+			"report": false,	//can't report 
+			"ldpi": ['ldpi'],	//0.75
+			"mdpi": ['mdpi'],	//1.0
+			"hdpi": ['hdpi'],	//1.5
+			"xhdpi":['xhdpi'] 	//2.0
 			/*
 				it reports
 				xhdpi for 2.0 pixel ratios
@@ -31,204 +97,276 @@
 				if there is no report no-dpi
 			*/
 		},
-
-		os:{
-			android: false,
-			blackberry: false,
-			ios: false,
-			linux: false,
-			mac: false,
-			win: false,
-			winphone: false,
-			x11: false
+		"os":{
+			"android": ['android'],
+			"blackberry": ['blackberry'],
+			"ios": ['ios'],
+			"linux": ['linux'],
+			"mac": ['mac'],
+			"win": ['win'],
+			"winmobile": ['winmobile'],
+			"winphone": ['winphone'],
+			"x11": ['x11']
+		}, 
+		"browser":{
+			"version": "",
+			"safari": ['safari'],
+			"safari_mobile": ['safari-mobile'],
+			"firefox": ['ff'],
+			"chrome": ['chrome'], 
+			"ie": ['ie'],
+			"ie_mobile": ['ie-mobile'],
+			"opera": ['opera']
 		},
 
-		browser:{
-			safari: false,
-			firefox: false,
-			chrome: false, 
-			ie: false
-		},
-
-		bengine:{
-			opera: false,
-			webkit: false,
-			gecko: false,
-			trident: false
+		"bengine":{
+			"opera": ['presto'],
+			"webkit": ['webkit'],
+			"gecko": ['gecko'],
+			"trident": ['trident']
 		}
 	};
 
 	var browser_detect = {
-		test: null,
-		report: null,
-		detect: null,
-		run: null,
+		"test": null,
+		"report": null,
+		"detect": feature_detect,
+		"run": null
+	};
+	win['bdjs'] = browser_detect;
+	var bdetect = feature_detect;
+	var features = {};
+	copy_feature_tree(features, feature_detect);
+	reset_feature_tree(feature_detect);
 
-		check: bdetect
+	var test = function(){
+		for(var k = 0; k < tests.length;k++){
+			tests[k]();
+		}
 	};
 
+	var report = function(pprefix){
+		var dom = document.documentElement;
+		var cint = classes_init;
+		var prefix_label = (pprefix == true)?"bdjs-":"";
+		//reset the registered classes 
+		//for a fresh report.
+		classes = cint.slice(0);
+		//evaluate features-tree based on states-tree
+		evaluate_features(feature_detect, features);
+		//process existing classnames, remove no-js if it
+		//exists
+		var csn = dom.className.split(" ");
+		var leftovers = "";
+		var c,v=[];
 
-	win['bdjs'] = bdetect;
+		//prefix if necessary
+		if(pprefix){
+			for(var x = 0; x < classes.length; x++){
+				c = classes[x];
+		 		c = (cint.indexOf(c) == -1)?prefix_label+c:c;
+		 		v.push(c);
+			}
+			classes = v;
+		}
 
-	var tests = [];
-	//feature detection
+		//now combine the rest, and deduplicate
+		for(var x = 0; x < classes.length; x++){
+			c = classes[x];
+			if(csn.indexOf(c) == -1){
+				csn.push(c);
+			}
+		}
+
+		var end_result = [];
+		for(var x = 0; x < csn.length; x++){
+			c = csn[x];
+			if(c != "no-js" && c != ""){
+				end_result.push(c);
+			}
+		}
+		leftovers = end_result.join(" ");
+		dom.className = leftovers;
+	};
+
+	var run = function(_prefix){
+		test();
+		report(_prefix);
+	};
+
+	browser_detect['report'] = report;
+	browser_detect['run'] = run;
+	browser_detect['test'] = test;
+
 	var detect_touch = function(){
 		//http://stackoverflow.com/questions/4817029/whats-the-best-way-to-detect-a-touch-screen-device-using-javascript
 		if('ontouchstart' in window || 'onmsgesturechange' in window){
-			classes.push('touch');
-		}else{
-			classes.push('no-touch');
+			bdetect['touch'] = true;
 		}
 	};
 	tests.push(detect_touch);
 
 	var detect_dpi = function(){
+		var odpi = bdetect['dpi'];
 		if('devicePixelRatio' in window){
-			console.log("devicePixelRatio registered");
-			bdetect.dpi.report = true;
+			//console.log("devicePixelRatio registered");
+			odpi['report'] = true;
 			var dpi = parseFloat(window.devicePixelRatio);
 			if(dpi < 1.0){
-				bdetect.dpi.ldpi = true;
-				classes.push("ldpi");
+				odpi['ldpi'] = true;
 			}else if(dpi >= 1.0 && dpi < 1.5){
-				bdetect.dpi.mdpi = true;
-				classes.push("mdpi");
+				odpi['mdpi'] = true;
 			}else if(dpi >= 1.5 && dpi < 2.0){
-				bdetect.dpi.hdpi = true;
-				classes.push("hdpi");
+				odpi['hdpi'] = true;
 			}else if(dpi >= 2.0){
-				bdetect.dpi.xhdpi = true;
-				classes.push("xhdpi");
+				odpi['xhdpi'] = true;
 			}
-
-		}else{
-			bdetect.dpi.report = false;
-			classes.push("no-dpi");
 		}
 	};
 	tests.push(detect_dpi);
 
-	var detect_device_type = function(){
-		var ua = navigator.userAgent;
-		var mobile_regexp = /(?:iPhone)|(?:iPad)|(?:Android)|(?:Windows Phone)|(?:Windows Mobile)|(?:BlackBerry)|(?:Mobile)|(?:tablet)|(?:phone)/i;
-		var mobile = mobile_regexp.test(ua);
-		if(mobile){
-			bdetect.devices.mobile = true;
-		}
-		//run the check for android
-		var test_android = /(?:Android)/i;
-		var test_linux = /(?:Linux)/i;
-		var test_iphone = /(?:iPhone)/i;
-		var test_ipad = /(?:iPad)/i;
-
-		var test_IEMobile = /(?:IEMobile)/i;
-		var test_arm = /(?:ARM)/i;
-		var test_windowsphone = /(?:Windows Phone)/i;
-		var test_windowsmobile = /(?Windows Mobile)/i;
-
-
-		//detect device and os
-		if(test_android.test(ua)){
-			bdetect.os.android = true;
-			classes.push('android');
-			//check if the user-agent string contains 'mobile'
-			if(false/*mobile check*/){
-				//then it is a phone
-				bdetect.devices.phone = true;
-
-			}else{
-				//if no mobile string, it's a tablet
-				bdetect.devices.tablet = true;
-			}
-		}else if(test_linux.test(ua) && !test_android.test(ua)){
-			bdetect.os.linux = true;
-		}else if(test_iphone.test(ua)){
-			bdetect.os.ios = true;
-			bdetect.devices.phone = true;
-		}else if(test_ipad.test(ua)){
-			bdetect.os.ios = true;
-			bdetect.devices.tablet = true;
-		}else if(/*blackberry*/){
-
-		}else if(/*blackberry playbook*/){
-
-		}else if(/*windows*/){
-
-		}else if(/*windows mobile*/){
-
-		}else if(/*windows phone*/){
-
-		}
-
-		//check if it is a phone, or tablet, or mobile
-		//or not mobile
-		if(bdetect.devices.phone){
-			classes.push('phone');
-		}else if(bdetect.devices.tablet){
-			classes.push('tablet');
-		}else{
-			classes.push('pc');
-		}
-
-		if(bdetect.devices.mobile){
-			classes.push('mobile');
-		}else{
-			classes.push('no-mobile')
-		}
-
-		if(bdetect.os.ios){
-			classes.push('ios');
-			if(bdetect.devices.phone)
-			{
-				classes.push('phone');
-				classes.push('iphone');
-			}else if(bdetect.devices.tablet){
-				classes.push('tablet');
-				classes.push('ipad');
-			}
-		}	
-
-	}
-	tests.push(detect_device_type);
-
-	//exceute the test suites
-	for(var k = 0; k < tests.length;k++){
-		tests[k]();
-	}
 
 	var detect_jquery = function(){
 		//check for jQuery
 		if($jquery){
-			classes.push("jq");
-		}else{
-			classes.push('no-jq');
+			bdetect['jq'] = true;
 		}
 	};
-	test.push(detect_jquery);
+	tests.push(detect_jquery);
 
-	//now add the css reporting
-	(function(){
 
-		//process existing classnames, remove no-js if it
-		//exists
-		var csn = document.documentElement.className.split(" ");
-		var leftovers = "";
-		
-		//now combine the rest
-		for(var x = 0; x < classes.length; x++){
-			csn.push(classes[x]);
+	var regex_collection = function(){
+		this.collection = [];
+		this.add = function(p){
+			this.collection.push(p);
 		}
-
-		for(var x = 0; x < csn.length; x++){
-			if(csn[x] != "no-js"){
-				leftovers += (x <= 0)?csn[x]:" " + csn[x];
+		this.test = function(s){
+			var res = false, c = this.collection;
+			for(var k = 0; k < c.length; k++){
+				res = res || c[k].test(s);
 			}
+			return res;
+		};
+	};
+
+	var recombine = function(rexp, collection){
+		if(!(collection == null || collection === undefined)){
+			collection.add(rexp);
+		}
+		return rexp;
+	};
+	var detect_device_type = function(){
+		var ua = navigator.userAgent;
+		var devices = bdetect['devices'];
+		var os = bdetect['os'];
+
+		var mobile_regexp = new regex_collection();
+		var test_tablet = recombine(/(?:Tablet)/i, mobile_regexp);
+		var test_phone = recombine(/(?:Phone)/i, mobile_regexp);
+		var test_mobile_str = recombine(/(?:Mobile)/i, mobile_regexp);
+
+		//run the check for android
+		var test_android = recombine(/(?:Android)/i, mobile_regexp);
+		var test_linux = /(?:Linux)/i;
+		var test_iphone = recombine(/(?:iPhone)/i, mobile_regexp);
+		var test_ipad = recombine(/(?:iPad)/i, mobile_regexp);
+		var test_ipod = recombine(/(?:iPod)/i, mobile_regexp);
+
+		//var test_IEMobile = recombine(/(?:IEMobile)/i, mobile_regexp);
+		//var test_arm = /(?:ARM)/i;
+		var test_windows = /(?:Windows NT)/i;
+		var test_windowsphone = recombine(/(?:Windows Phone)/i, mobile_regexp);
+		var test_windowsmobile = recombine(/(?:Windows Mobile)/i, mobile_regexp);
+
+		var test_blackberry = recombine(/(?:BlackBerry)/i, mobile_regexp);
+		var test_bbplaybook = recombine(/(?:Playbook)|(?:RIM Tablet)/i, mobile_regexp);
+
+		var test_macos = /(?:Mac Os X)/i;
+		var test_macintosh = /(?:Macintosh)/i;
+
+		var test_x11 = /(?:x11)/i;
+
+		//test mobile
+		//var mobile_regexp = /(?:iPhone)|(?:iPad)|(?:Android)|(?:Windows Phone)|(?:Playbook)|(?:Windows Mobile)|(?:BlackBerry)|(?:Mobile)|(?:tablet)|(?:phone)/i;
+		var mobile = mobile_regexp.test(ua);
+		if(mobile){
+			devices['mobile'] = true;
 		}
 
+		//detect device and os
+		//and also only report OS here,
+		//not the device family because the device family
+		//might change else where
+		if(test_android.test(ua)){
+			os['android'] = true;
+			classes.push('android');
+			//check if the user-agent string contains 'mobile'
+			if(test_mobile_str.test(ua)){
+				//then it is a phone
+				devices['phone'] = true;
+			}else{
+				//if no mobile string is present, it's a tablet
+				devices['tablet'] = true;
+			}
+		}else if(test_linux.test(ua) && !test_android.test(ua))
+		{
+			os['linux'] = true; 
+		}else if(test_iphone.test(ua) || test_ipod.test(ua))
+		{
+			//iphone or ipod
+			os['ios'] = true;
+			devices['phone'] = true;
+			devices['iphone'] = true;
 
-		document.documentElement.className = leftovers;
+		}else if(test_ipad.test(ua)){
+			//ipad
+			os['ios'] = true;
+			devices['tablet'] = true;
+			devices['ipad'] = true;
+		}else if(test_blackberry.test(ua)){
+			//black berry
+			os['blackberry'] = true;
+			devices['phone'] = true;
+		}else if(test_bbplaybook.test(ua)){
+			//playbook
+			os['blackberry'] = true;
+			devices['tablet'] = true;
+		}else if(test_windows.test(ua) && !test_windowsmobile.test(ua) && !test_windowsphone.test(ua)){
+			os['win'] = true;
+			if(mobile){
+				if(test_phone.test(ua)){
+					devices['phone'] = true;
+				}else if(test_tablet.test(ua)){
+					devices['tablet'] = true;
+				}
+			}
+		}else if(test_windowsmobile.test(ua)){
+			os['winmobile'] = true;
+		}else if(test_windowsphone.test(ua)){
+			os['winphone'] = true;
+			if(test_tablet.test(ua)){
+				devices['tablet'] = true;
+			}else{
+				devices['phone'] = true;
+			}
+		}else if(!test_iphone.test(ua) && !test_ipad.test(ua) && test_macos.test(ua) && test_macintosh.test(ua)){
+			os['mac'] = true;
+		}else if(test_x11.test(ua) && !test_blackberry.test(ua)){
+			os['x11'] = true;
+		}
 
-	})();
+		//test if the UA is reporting tablet or phone, 
+		//and overright the conditions above
+		//if and only we didn't already registered it the 
+		//opposite
+		if(test_tablet.test(ua) && !devices['phone']){
+			devices['tablet'] = true;
+		}else if(test_phone.test(ua) && !devices['tablet']){
+			devices['phone'] = true;
+		}
+	}
+	tests.push(detect_device_type);
 
-
-})(this.jQuery, window); //(typeof jQuery=="undefined"?undefined:jQuery)
+	run(prefix);
+	
+})(this.jQuery, window, false); //(typeof jQuery=="undefined"?undefined:jQuery)
