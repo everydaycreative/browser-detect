@@ -32,9 +32,9 @@ At this stage, browser-detect is not mature, not stable, and not really anything
 * touch detection reporting
 * crystalize the pattern used in development and add the ability to drop tests.
 * add detection of device density according to [Android's guide on support screen sizes](http://developer.android.com/guide/practices/screens_support.html) and report them as such.
+* conditional loading.
 
 ### Credits ##
-
-* IE-version check method  
-* Touch detect that works for Windows Surface devices and other devices
+* IE-version check method from: 
+* Touch detect that works for Windows Surface devices and other devices, from: http://stackoverflow.com/questions/4817029/whats-the-best-way-to-detect-a-touch-screen-device-using-javascript
 
