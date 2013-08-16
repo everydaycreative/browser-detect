@@ -81,6 +81,7 @@
 			"tablet": ['tablet'],
 			"iphone": ['iphone'],
 			"ipad": ['ipad'],
+			"playbook": ['playbook'],
 			"other": false
 		},
 		"dpi":{
@@ -135,7 +136,7 @@
 		},
 
 		"bengine":{
-			"opera": ['presto'],
+			"presto": ['presto'],
 			"webkit": ['webkit'],
 			"gecko": ['gecko'],
 			"trident": ['trident']
@@ -270,6 +271,11 @@
 		}
 		return rexp;
 	};
+
+	var regex_device = function(exp){
+		return new RegExp("(?:"+exp+")", "i");
+	};
+
 	var detect_device_type = function(){
 		var ua = navigator.userAgent;
 		var devices = bdetect['devices'];
@@ -294,7 +300,12 @@
 		var test_windowsmobile = recombine(/(?:Windows Mobile)/i, mobile_regexp);
 
 		var test_blackberry = recombine(/(?:BlackBerry)/i, mobile_regexp);
-		var test_bbplaybook = recombine(/(?:Playbook)|(?:RIM Tablet)/i, mobile_regexp);
+		var test_rim = regex_device("RIM Tablet");
+		var test_playbook = regex_device("Playbook");
+		var test_bbplaybook = new regex_collection();
+		recombine(test_playbook, test_bbplaybook);
+		recombine(test_rim, test_bbplaybook);
+		recombine(test_bbplaybook, mobile_regexp)
 
 		var test_macos = /(?:Mac Os X)/i;
 		var test_macintosh = /(?:Macintosh)/i;
@@ -314,7 +325,6 @@
 		//might change else where
 		if(test_android.test(ua)){
 			os['android'] = true;
-			classes.push('android');
 			//check if the user-agent string contains 'mobile'
 			if(test_mobile_str.test(ua)){
 				//then it is a phone
@@ -346,6 +356,7 @@
 			//playbook
 			os['blackberry'] = true;
 			devices['tablet'] = true;
+			devices['playbook'] = true;
 		}else if(test_windows.test(ua) && !test_windowsmobile.test(ua) && !test_windowsphone.test(ua)){
 			os['win'] = true;
 			if(mobile){
@@ -388,6 +399,28 @@
 	};**/
 
 	var detect_browser = function(){
+		var ua = navigator.userAgent;
+		var browser = bdetect['browser'];
+		var engine = bdetect['bengine'];
+
+		var gen_renderexp = function(n){
+			return new RegExp("(?:\\b"+n+"/[\\d]+[.]*[\\d]*[.]*[\\d]*)", "i");
+		};
+
+		var webkit = gen_renderexp("AppleWebKit");
+		var gecko = gen_renderexp("Gecko");
+		var presto = gen_renderexp("Presto");
+		var trident = gen_renderexp("Trident");
+
+		if(webkit.test(ua)){
+			engine['webkit'] = true;
+		}else if(gecko.test(ua)){
+			engine['gecko'] = true;
+		}else if(presto.test(ua)){
+			engine['presto'] = true;
+		}else if(trident.test(ua)){
+			engine['trident'] = true;
+		}
 
 	}
 	tests.push(detect_browser);
