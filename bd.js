@@ -131,6 +131,11 @@
 			"firefox": ['ff'],
 			"chrome": ['chrome'], 
 			"ie": ['ie'],
+			"ie6": ['ie6'],
+			"ie7": ['ie7'],
+			"ie8": ['ie8'],
+			"ie9": ['ie9'],
+			"ie10": ['ie10'],
 			"ie_mobile": ['ie-mobile'],
 			"opera": ['opera']
 		},
@@ -147,7 +152,8 @@
 		"test": null,
 		"report": null,
 		"detect": feature_detect,
-		"run": null
+		"run": null,
+		"ua": ""
 	};
 	win['bdjs'] = browser_detect;
 	var bdetect = feature_detect;
@@ -155,7 +161,8 @@
 	copy_feature_tree(features, feature_detect);
 	reset_feature_tree(feature_detect);
 
-	var test = function(){
+	var test = function(ua){
+		browser_detect['ua'] = (ua === undefined)?navigator.userAgent:ua;
 		for(var k = 0; k < tests.length;k++){
 			tests[k]();
 		}
@@ -213,6 +220,16 @@
 	browser_detect['report'] = report;
 	browser_detect['run'] = run;
 	browser_detect['test'] = test;
+
+	var ua = function(k){
+			return k.test(browser_detect['ua']);
+	};
+	this['ua'] = ua;
+
+	var uax = function(k){
+		return k.exec(browser_detect['ua']);
+	};
+	this['uax'] = uax;
 
 	var detect_touch = function(){
 		//@Author: http://stackoverflow.com/questions/4817029/whats-the-best-way-to-detect-a-touch-screen-device-using-javascript
@@ -276,30 +293,36 @@
 		return new RegExp("(?:"+exp+")", "i");
 	};
 
+
+
 	var detect_device_type = function(){
-		var ua = navigator.userAgent;
+		//var ua = navigator.userAgent;
 		var devices = bdetect['devices'];
 		var os = bdetect['os'];
 
+
 		var mobile_regexp = new regex_collection();
-		var test_tablet = recombine(/(?:Tablet)/i, mobile_regexp);
-		var test_phone = recombine(/(?:Phone)/i, mobile_regexp);
-		var test_mobile_str = recombine(/(?:Mobile)/i, mobile_regexp);
+		var regrcomb = function(exp){
+			return recombine(regex_device(exp), mobile_regexp);
+		}
+		var test_tablet = regrcomb("Tablet");
+		var test_phone = regrcomb("Phone");
+		var test_mobile_str = regrcomb("Mobile");
 
 		//run the check for android
-		var test_android = recombine(/(?:Android)/i, mobile_regexp);
-		var test_linux = /(?:Linux)/i;
-		var test_iphone = recombine(/(?:iPhone)/i, mobile_regexp);
-		var test_ipad = recombine(/(?:iPad)/i, mobile_regexp);
-		var test_ipod = recombine(/(?:iPod)/i, mobile_regexp);
+		var test_android = regrcomb("Android");
+		var test_linux = regex_device("Linux");
+		var test_iphone = regrcomb("iPhone");
+		var test_ipad = regrcomb("iPad");
+		var test_ipod = regrcomb("iPod");
 
 		//var test_IEMobile = recombine(/(?:IEMobile)/i, mobile_regexp);
 		//var test_arm = /(?:ARM)/i;
-		var test_windows = /(?:Windows NT)/i;
-		var test_windowsphone = recombine(/(?:Windows Phone)/i, mobile_regexp);
-		var test_windowsmobile = recombine(/(?:Windows Mobile)/i, mobile_regexp);
+		var test_windows = regex_device("Windows NT");
+		var test_windowsphone = regrcomb("Windows Phone");
+		var test_windowsmobile = regrcomb("Windows Mobile");
 
-		var test_blackberry = recombine(/(?:BlackBerry)/i, mobile_regexp);
+		var test_blackberry = regrcomb("BlackBerry");
 		var test_rim = regex_device("RIM Tablet");
 		var test_playbook = regex_device("Playbook");
 		var test_bbplaybook = new regex_collection();
@@ -307,14 +330,14 @@
 		recombine(test_rim, test_bbplaybook);
 		recombine(test_bbplaybook, mobile_regexp)
 
-		var test_macos = /(?:Mac Os X)/i;
-		var test_macintosh = /(?:Macintosh)/i;
+		var test_macos = regex_device("Mac Os X");
+		var test_macintosh = regex_device("Macintosh");
 
-		var test_x11 = /(?:x11)/i;
+		var test_x11 = regex_device("x11");
 
 		//test mobile
 		//var mobile_regexp = /(?:iPhone)|(?:iPad)|(?:Android)|(?:Windows Phone)|(?:Playbook)|(?:Windows Mobile)|(?:BlackBerry)|(?:Mobile)|(?:tablet)|(?:phone)/i;
-		var mobile = mobile_regexp.test(ua);
+		var mobile = ua(mobile_regexp);
 		if(mobile){
 			devices['mobile'] = true;
 		}
@@ -323,61 +346,61 @@
 		//and also only report OS here,
 		//not the device family because the device family
 		//might change else where
-		if(test_android.test(ua)){
+		if(ua(test_android)){
 			os['android'] = true;
 			//check if the user-agent string contains 'mobile'
-			if(test_mobile_str.test(ua)){
+			if(ua(test_mobile_str)){
 				//then it is a phone
 				devices['phone'] = true;
 			}else{
 				//if no mobile string is present, it's a tablet
 				devices['tablet'] = true;
 			}
-		}else if(test_linux.test(ua) && !test_android.test(ua))
+		}else if(ua(test_linux) && !ua(test_android))
 		{
 			os['linux'] = true; 
-		}else if(test_iphone.test(ua) || test_ipod.test(ua))
+		}else if(ua(test_iphone) || ua(test_ipod))
 		{
 			//iphone or ipod
 			os['ios'] = true;
 			devices['phone'] = true;
 			devices['iphone'] = true;
 
-		}else if(test_ipad.test(ua)){
+		}else if(ua(test_ipad)){
 			//ipad
 			os['ios'] = true;
 			devices['tablet'] = true;
 			devices['ipad'] = true;
-		}else if(test_blackberry.test(ua)){
+		}else if(ua(test_blackberry)){
 			//black berry
 			os['blackberry'] = true;
 			devices['phone'] = true;
-		}else if(test_bbplaybook.test(ua)){
+		}else if(ua(test_bbplaybook)){
 			//playbook
 			os['blackberry'] = true;
 			devices['tablet'] = true;
 			devices['playbook'] = true;
-		}else if(test_windows.test(ua) && !test_windowsmobile.test(ua) && !test_windowsphone.test(ua)){
+		}else if(ua(test_windows) && !ua(test_windowsmobile) && !ua(test_windowsphone)){
 			os['win'] = true;
 			if(mobile){
-				if(test_phone.test(ua)){
+				if(ua(test_phone)){
 					devices['phone'] = true;
-				}else if(test_tablet.test(ua)){
+				}else if(ua(test_tablet)){
 					devices['tablet'] = true;
 				}
 			}
-		}else if(test_windowsmobile.test(ua)){
+		}else if(ua(test_windowsmobile)){
 			os['winmobile'] = true;
-		}else if(test_windowsphone.test(ua)){
+		}else if(ua(test_windowsphone)){
 			os['winphone'] = true;
-			if(test_tablet.test(ua)){
+			if(ua(test_tablet)){
 				devices['tablet'] = true;
 			}else{
 				devices['phone'] = true;
 			}
-		}else if(!test_iphone.test(ua) && !test_ipad.test(ua) && test_macos.test(ua) && test_macintosh.test(ua)){
+		}else if(!ua(test_iphone) && !ua(test_ipad) && ua(test_macos) && ua(test_macintosh)){
 			os['mac'] = true;
-		}else if(test_x11.test(ua) && !test_blackberry.test(ua)){
+		}else if(ua(test_x11) && !ua(test_blackberry)){
 			os['x11'] = true;
 		}
 
@@ -385,10 +408,12 @@
 		//and overright the conditions above
 		//if and only we didn't already registered it the 
 		//opposite
-		if(test_tablet.test(ua) && !devices['phone']){
+		if(ua(test_tablet) && !devices['phone']){
 			devices['tablet'] = true;
-		}else if(test_phone.test(ua) && !devices['tablet']){
+			devices['mobile'] = true;
+		}else if(ua(test_phone) && !devices['tablet']){
 			devices['phone'] = true;
+			devices['mobile'] = true;
 		}
 	}
 	tests.push(detect_device_type);
@@ -399,12 +424,11 @@
 	};**/
 
 	var detect_browser = function(){
-		var ua = navigator.userAgent;
 		var browser = bdetect['browser'];
 		var engine = bdetect['bengine'];
 
 		var gen_renderexp = function(n){
-			return new RegExp("(?:\\b"+n+"/[\\d]+[.]*[\\d]*[.]*[\\d]*)", "i");
+			return new RegExp("(\\b"+n+")\/([\\d]+[.]*[\\d]*[.]*[\\d]*)", "i");
 		};
 
 		var webkit = gen_renderexp("AppleWebKit");
@@ -412,18 +436,88 @@
 		var presto = gen_renderexp("Presto");
 		var trident = gen_renderexp("Trident");
 
-		if(webkit.test(ua)){
+		if(ua(webkit)){
 			engine['webkit'] = true;
-		}else if(gecko.test(ua)){
+		}else if(ua(gecko)){
 			engine['gecko'] = true;
-		}else if(presto.test(ua)){
+		}else if(ua(presto)){
 			engine['presto'] = true;
-		}else if(trident.test(ua)){
+		}else if(ua(trident)){
 			engine['trident'] = true;
 		}
 
+
+		/*browser detect */
+		var safari = gen_renderexp("Safari");
+		var mobile = gen_renderexp("Mobile");
+		var version = gen_renderexp("Version");
+		var safari_mobile = gen_renderexp("Mobile Safari");
+		var firefox = gen_renderexp("Firefox");
+		var seamonkey = gen_renderexp("Seamonkey");
+		var chrome = gen_renderexp("Chrome");
+		var chromium = gen_renderexp("Chromium");
+		var opera = gen_renderexp("Opera");
+		var opera_15 = gen_renderexp("OPR");
+		var opera_mini = gen_renderexp("Opera Mini");
+		var opera_mobi = gen_renderexp("Opera Mobi");
+		var ie = /(\bMSIE )([\d]+.[\d]*[\w]*)/i;
+		var ie_mobile = gen_renderexp("IEMobile");
+
+		var get_version = function(o){
+			if(ua(o)){
+				browser['version'] = uax(o)[2];
+			}
+		}
+		if(ua(firefox) && !ua(seamonkey)){
+			browser['firefox'] = true;
+			//get version
+			get_version(firefox);
+		}else if(ua(chrome) && !ua(chromium)){
+			browser['chrome'] = true;
+			get_version(chrome);
+		}else if(ua(safari) && !ua(chrome) && !ua(opera_15) && !ua(opera) && !ua(opera_mini)){
+			//whether mobile or not, it's safair?
+			browser['safari'] = true;
+
+			if(ua(safari_mobile) || ua(mobile)){
+				browser['safari_mobile'] = true;
+			}else{
+				//browser['safari'] = true;
+			}
+			//check if we can get version
+			get_version(version);
+		}else if(ua(opera)|| ua(opera_15) || ua(opera_mini) || ua(opera_mobi)){
+			browser['opera'] = true;
+			get_version(opera);
+			get_version(opera_mini);
+			get_version(opera_mobi);
+			get_version(opera_15);
+		}else if(ua(ie)){
+			//IE
+			if(ua(ie_mobile)){
+				browser['ie_mobile'] = true;
+				get_version(ie_mobile);
+			}else{
+				browser['ie'] = true;
+				get_version(ie);
+			}
+
+			if(browser['version'] != ""){
+				var n,s = browser['version'];
+				var vs = s.split(".");
+				if(vs.length >= 1){
+					n = parseInt(vs[0]);
+					if(!isNaN(n)){
+						browser['ie'+n] = true;
+					}
+				}
+			}
+		} 
+		
 	}
 	tests.push(detect_browser);
 	run(prefix);
 	
-})(this.jQuery, window, false); //(typeof jQuery=="undefined"?undefined:jQuery)
+})(this['jQuery'], window, false); //(typeof jQuery=="undefined"?undefined:jQuery)
+
+
