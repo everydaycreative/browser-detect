@@ -2,9 +2,220 @@
 <html lang="en" class="edc no-js">
 <head>
 	<title>Browser Detect Demo</title>
-	<script src="jquery.min.js"></script>
-	<script src="bd.tree.min.js"></script>
+	<script src="bd.min.js"></script>
+	<style TYPE="text/css">
+		body{
+			width: 100%;
+			max-width: 100%;
+			min-width: 100%;
+		}
+		h3{
+			margin: 0 auto;
+			text-align: center;
+			display: none;
+		}
+
+		h3.show{
+			display: block;
+		}
+
+		.iphone h3.iphone{
+			display: block;
+		}
+
+		.ipad h3.ipad{
+			display: block;
+		}
+
+		.phone h3.phone{
+			display: block;
+		}
+
+		.tablet h3.tablet{
+			display:block;
+		}
+
+		.mobile h3.mobile{
+			display:block;
+		}
+		.no-mobile h3.no-mobile{
+			display:block;
+		}
+
+		.touch h3.touch{
+			display:block;
+		}
+		.no-touch h3.no-touch{
+			display:block;
+		}
+
+		.jq h3.jq{
+			display:block;
+		}
+		.no-jq h3.no-jq{
+			display:block;
+		}
+
+		/* os */
+		.android h3.android{
+			display:block;
+		}
+
+		.blackberry h3.blackberry{
+			display:block;
+		}
+
+		.ios h3.ios{
+			display:block;
+		}
+
+		.linux h3.linux{
+			display:block;
+		}
+
+		.mac h3.mac{
+			display:block;
+		}
+
+		.win h3.win{
+			display:block;
+		}
+
+		.winphone h3.winphone{
+			display:block;
+		}
+
+		.winmobile h3.winmobile{
+			display:block;
+		}
+
+		.x11 h3.xll{
+			display:block;
+		}
+
+		/* web browser engines */
+		.webkit h3.webkit{
+			display:block;
+		}
+
+		.trident h3.trident{
+			display:block;
+		}
+
+		.presto h3.presto{
+			display:block;
+		}
+
+		.gecko h3.gecko{
+			display:block;
+		}
+
+		/* web browsers */
+		.safari h3.safari{
+			display:block;
+		}
+
+		.safari-mobile h3.safari-mobile{
+			display:block;
+		}
+
+		.ff h3.ff{
+			display:block;
+		}
+
+		.chrome h3.chrome{
+			display:block;
+		}
+
+		.ie h3.ie{
+			display:block;
+		}
+
+		.ie6 h3.ie6{
+			display:block;
+		}
+
+		.ie7 h3.ie7{
+			display:block;
+		}
+
+		.ie8 h3.ie8{
+			display:block;
+		}
+
+		.ie9 h3.ie9{
+			display:block;
+		}
+
+		.ie10 h3.ie10{
+			display:block;
+		}
+
+		.ie-mobile h3.ie-mobile{
+			display:block;
+		}
+
+		/*DPI */
+		.ldpi h3.ldpi{
+			display:block;
+		}
+
+		.mdpi h3.mdpi{
+			display:block;
+		}
+
+		.hdpi h3.hdpi{
+			display:block;
+		}
+		.xhdpi h3.xhdpi{
+			display:block;
+		}
+
+	</style>
 </head>
 <body>
+	<h3 class="show">Let me tell you a little something about your device</h3>
+	
+	<h3 class="touch">First, you can really touch this</h3>
+	<h3 class="no-touch">First, you can't touch this.</h3>
+	
+	<h3 class="no-mobile">Second, it doesn't seem to be that mobile.</h3>
+	<h3 class="mobile">Second, it is mobile.</h3>
+
+	<h3 class="phone">It also feels light, like something you can grasp in a single hand, sort of like a phone.</h3>
+	<h3 class="tablet">It is also little hefty, a bit like a tablet.</h3>
+	
+	<h3 class="android">And it might be an android device. </h3>
+	<h3 class="ios">And it might be an iOS device.</h3>
+	<h3 class="blackberry">And it seems to be some sort of blackberry...</h3>
+	<h3 class="linux">And it looks like you are running  linux on it.</h3>
+	<h3 class="mac">And, from the looks of it, you got a mac.</h3>
+	<h3 class="win">And you are running windows on it.</h3>
+	<h3 class="winmobile">And it seems be running a version of windows for mobile devices. </h3>
+	<h3 class="winphone">And it seems to be one of those windows phone.</h3>
+	<h3 class="x11">And you are running that mysterious X11 thing on it.</h3>
+
+	
+	<h3 class="ldpi">As for the display and how things look, it seems to be on the lower end.</h3>
+	<h3 class="mdpi">As for how things look on it, it seems to be quite 'medium'.</h3>
+	<h3 class="hdpi">When using it to look at things, it is approaching print quality</h3>
+	<h3 class="xhdpi">When using it to look at things, it looks great.</h3>
+
+	<h3 class="ff">firefox</h3>
+	<h3 class="safari">safari</h3>
+	<h3 class="safari-mobile">and it seems to be the mobile version</h3>
+	<h3 class="chrome">chrome</h3>
+	<h3 class="ie">internet explore</h3>
+	<h3 class="ie6">and you haven't updated it in a while...</h3>
+	<h3 class="ie7">and it's a bit dated</h3>
+	<h3 class="ie8">and you are using version 8</h3>
+	<h3 class="ie9">and it isn't that out of date.</h3>
+	<h3 class="ie10">and it's latest version.</h3>
+
+	<h3 class="webkit">and the underlying rendering is the most popular one of them all: webkit</h3>
+	<h3 class="trident">and trident, uh...</h3>
+	<h3 class="presto">presto</h3>
+	<h3 class="gecko">gecko</h3>
+
 </body>
 </html>
