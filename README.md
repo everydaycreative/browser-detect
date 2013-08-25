@@ -47,6 +47,7 @@ Device pixel density:
 * xhdpi (2.0), aka retina
  
 through bdjs.detect.dpi, or through css via: .ldp, .mdpi, .hdpi, .xhdpi.
+
 see [Android's guide on supporting screen sizes](http://developer.android.com/guide/practices/screens_support.html) for more info.
 
 Device families, using some 'heuristic':
