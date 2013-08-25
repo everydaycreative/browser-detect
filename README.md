@@ -1,4 +1,4 @@
-browser-detect (ALPHA+DRAFT)
+browser-detect (+DRAFT)
 ==============
 
 __Browser-detect__  simply detects from the user-agent the sort of browser being used, checking whether if it is a mobile version of a browser and gathering other assorted device information that are useful. It then reports what it detects by populating the HTML root element with classes and also by making avaliable the same information through an object accessible through browserdetect. 
@@ -55,9 +55,10 @@ Device families, using some 'heuristic':
 * iphone
 * ipad
 * playbook
-* mobile, if it being reported as a mobile device in its UA string.
+* mobile, if it is being reported as a mobile device in its UA string.
+* desktop (really is the null-case where if none the above is reported than we default it to desktop)
 
-through bdjs.detect.devices, or through css via: .no-mobile, .mobile, .playbook, .ipad, .iphone, .tablet, .phone.
+through bdjs.detect.devices, or through css via: .no-mobile, .mobile, .playbook, .ipad, .iphone, .tablet, .no-tablet, .phone. .no-phone, .desktop, .no-desktop
 
 Touch detection: through bdjs.detect.touch, or in css via .touch and .no-touch
 
