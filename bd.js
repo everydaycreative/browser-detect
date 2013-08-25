@@ -466,6 +466,11 @@
             devices['phone'] = true;
             devices['mobile'] = true;
         }
+
+        //desktop defaulting
+        if(!devices['mobile'] && !devices['phone'] && !devices['tablet']){
+            devices['desktop'] = true;
+        }
     }
     tests.push(detect_device_type);
 
