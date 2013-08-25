@@ -1,5 +1,5 @@
 /*!
- *  Browser-Detect  version: 0.5
+ *  Browser-Detect  version: 0.6
  *  Reports browser vendor, touch and dpi checking upon loading.
  *  http://github.com/everydaycreative/browser-detect
  *  Authors: @everydaycreative (everydaycreative.ca)
@@ -179,7 +179,7 @@
         //spec: no duplicates, and simply add it to the list
         //reports true on success, false on that there is a dupe
         if (reported_classes.indexOf(classname) == -1) {
-
+            reported_classes.push(classname);
             return true;
         }
         return false;
@@ -210,6 +210,14 @@
         var leftovers = "";
         var c, v = [],
             x;
+
+        //merge non-structured 'reported classes' with classes reported from
+        //the feature tree, and make sure no duplication or naming conflict occurs
+        for(x = 0; x < reported_classes.length; x++){
+            if(classes.indexOf(reported_classes[x]) == -1){
+                classes.push(reported_classes[x]);
+            }
+        }
 
         //prefix if necessary
         if (pprefix) {
