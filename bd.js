@@ -90,6 +90,7 @@
             "mobile": ['mobile', 'no-mobile'],
             "phone": ['phone', 'no-phone'],
             "tablet": ['tablet', 'no-tablet'],
+            "desktop": ['desktop', 'no-desktop'],
             "iphone": ['iphone'],
             "ipad": ['ipad'],
             "playbook": ['playbook'],
