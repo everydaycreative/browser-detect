@@ -77,7 +77,7 @@ It also allows for a separation of concerns in designing where you can separete 
 
 #### How is it different from conditionizr?####
 	
-Conditionizr is great, but it does not provide a way to report if the browser detected is a mobile version, or whether it is installed on a phone, tablet, or some other device. The UA string sometimes report this, and it might be useful information.
+Conditionizr is great, but it does not provide a way to report if the browser detected is a mobile version, or whether it is installed on a phone, tablet, or some other device. The UA string sometimes report this, and it might be useful information. Another bigger difference is that this library has a bit more heft in terms of the minified file size. This is because there are a lot of regular expressions in it to detect all sorts of browsers, rendering engines and devices. 
 
 #### How is it currently being used? ####
   
