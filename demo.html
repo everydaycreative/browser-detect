@@ -2,7 +2,8 @@
 <html lang="en" class="edc no-js">
 <head>
 	<title>Browser Detect Demo</title>
-	<script src="bd.min.js"></script>
+	<script src="bd.js"></script>
+	<script src="jquery.min.js"></script>
 	<style TYPE="text/css">
 		body{
 			width: 100%;
@@ -66,6 +67,22 @@
 		}
 
 		.ios h3.ios{
+			display:block;
+		}
+
+		.ios4 h3.ios4{
+			display:block;
+		}
+
+		.ios5 h3.ios5{
+			display:block;
+		}
+
+		.ios6 h3.ios6{
+			display:block;
+		}
+
+		.ios7 h3.ios7{
 			display:block;
 		}
 
@@ -171,6 +188,18 @@
 			display:block;
 		}
 
+		.ios.mobile.no-touch h3.specific{
+			display: block;
+		}
+
+		.ios.mobile.xhdpi h3.retina{
+			display: block;
+		}
+
+		.mac.xhdpi h3.retina{
+			display: block;
+		}
+
 	</style>
 </head>
 <body>
@@ -216,6 +245,22 @@
 	<h3 class="trident">and trident, uh...</h3>
 	<h3 class="presto">presto</h3>
 	<h3 class="gecko">gecko</h3>
-
+	<h3 class="specific">this will only show in a specific case where you are using an iOS useragent on some device that doesn't support touch</h3>
+	<h3 class="retina">it is only called retina display when the pixel density is really high and it's on a mac or iOS device</h3>
+	<script type="text/javascript">
+		$(function(){
+			$(".useragent").text("user agent: "+ navigator.userAgent);
+		});
+	</script>
+	<h3 class="useragent show"></h3>
+    <div>
+        <ul>
+            <li class="item" id="">crazy horse</li>
+            <li class="item" id="">dirty donkey</li>
+            <li class="item" id="">little ponkey</li>
+            <li class="item" id="">mully mule</li>
+            <li class="item" id="">zaney zebra</li>
+        </ul>
+    </div>
 </body>
 </html>
