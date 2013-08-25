@@ -122,7 +122,8 @@
 			"win": ['win'],
 			"winmobile": ['winmobile'],
 			"winphone": ['winphone'],
-			"x11": ['x11']
+			"x11": ['x11'],
+			"version": ""
 		}, 
 		"browser":{
 			"version": "",
@@ -161,7 +162,21 @@
 	copy_feature_tree(features, feature_detect);
 	reset_feature_tree(feature_detect);
 
+	var reported_classes = [];
+	var report_class = function(classname){
+		//spec: no duplicates, and simply add it to the list
+		//reports true on success, false on that there is a dupe
+		if(reported_classes.indexOf(classname) == -1){
+
+			return true;
+		}
+		return false;
+	};
+
 	var test = function(ua){
+		//every new test we clear the results of the previous test, which
+		//means we have to clear the results that comes from reported_classes
+		reported_classes = [];
 		browser_detect['ua'] = (ua === undefined)?navigator.userAgent:ua;
 		for(var k = 0; k < tests.length;k++){
 			tests[k]();
@@ -404,8 +419,27 @@
 			os['x11'] = true;
 		}
 
+		//version reporting
+		var verreport = function(v){
+			return (v?"."+v:"")
+		}
+		if(os['ios']){
+			var reg_iosv =/(?:iPad|iPhone|iPod); CPU(?:[\s]iPhone)* OS ([\d]+)_([\d]+)(?:[\s]|_([\d]+)[\s]|(?:_[\d]+)+[\s])(?:like Mac OS X)/i;
+			var ver = uax(reg_iosv);
+			var ios_v = parseInt(ver[1]);
+			os['version'] = ver[1] +verreport(ver[2]) + verreport(ver[3]);	
+			report_class("ios"+ios_v);
+		}else if(os['android']){
+			var reg_andr = /(?:Linux; Android) ([\d]).([\d]).([\d]);/i;
+			var ver = uax(reg_andr);
+			var andr_v = parseInt(ver[1])
+			os['version'] = ver[1] +verreport(ver[2]) + verreport(ver[3]);
+			report_class("android"+andr_v);	
+		}
+
 		//test if the UA is reporting tablet or phone, 
 		//and overright the conditions above
+
 		//if and only we didn't already registered it the 
 		//opposite
 		if(ua(test_tablet) && !devices['phone']){
